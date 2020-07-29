@@ -1,9 +1,21 @@
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Keyboard } from 'react-native';
+import { Keyboard, ActivityIndicator } from 'react-native';
 import api from '../../services/api';
 
-import { Container, Form, Input, SubmitButton } from './styles';
+import {
+    Container,
+    Form,
+    Input,
+    SubmitButton,
+    List,
+    UserGit,
+    Avatar,
+    Name,
+    Bio,
+    ProfileButton,
+    ProfileButtonText,
+} from './styles';
 
 class User extends Component {
     constructor(props) {
@@ -11,11 +23,14 @@ class User extends Component {
         this.state = {
             newUser: '',
             users: [],
+            loading: false,
         };
     }
 
     handleAddUser = async () => {
         const { users, newUser } = this.state;
+        this.setState({ loading: true });
+
         const response = await api.get(`/users/${newUser}`);
 
         const data = {
@@ -28,13 +43,14 @@ class User extends Component {
         this.setState({
             users: [...users, data],
             newUser: '',
+            loading: false,
         });
 
         Keyboard.dismiss();
     };
 
     render() {
-        const { newUser } = this.state;
+        const { users, newUser, loading } = this.state;
 
         return (
             <Container>
@@ -51,11 +67,33 @@ class User extends Component {
                         onSubmitEditing={this.handleAddUser} // chamando o metodo de add user
                     />
                     <SubmitButton
+                        loading={loading}
                         onPress={this.handleAddUser} // chamando o metodo de ação para add user
                     >
-                        <Icon name="add" size={20} color="#fff" />
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Icon name="add" size={20} color="#fff" />
+                        )}
                     </SubmitButton>
                 </Form>
+
+                <List
+                    data={users}
+                    keyExtractor={(user) => user.login}
+                    renderItem={({ item }) => (
+                        <UserGit>
+                            <Avatar source={{ uri: item.avatar }} />
+                            <Name>{item.name}</Name>
+                            <Bio>{item.bio}</Bio>
+                            <ProfileButton onPress={() => {}}>
+                                <ProfileButtonText>
+                                    Ver Perfil
+                                </ProfileButtonText>
+                            </ProfileButton>
+                        </UserGit>
+                    )}
+                />
             </Container>
         );
     }
