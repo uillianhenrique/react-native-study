@@ -6,10 +6,13 @@ import api from '../../services/api';
 import { Container, Form, Input, SubmitButton } from './styles';
 
 class User extends Component {
-    state = {
-        newUser: '',
-        users: [],
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            newUser: '',
+            users: [],
+        };
+    }
 
     handleAddUser = async () => {
         const { users, newUser } = this.state;
